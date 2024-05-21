@@ -1,0 +1,38 @@
+---
+- name: Instalar python y visual studio
+  hosts: all
+  become: yes
+  tasks:
+    - name: Actualizar paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar prerequisitos
+      apt:
+        name: software-properties-common
+        state: present
+
+    - name: Añadir deadsnakes
+      apt_repository:
+        repo: ppa:deadsnakes/ppa
+        state: present
+
+    - name: Instalar Python 3.x
+      apt:
+        name: python3
+        state: latest
+
+    - name: Añadir Microsoft GPG key
+      apt_key:
+        url: https://packages.microsoft.com/keys/microsoft.asc
+        state: present
+
+    - name: Añadir Microsoft repository
+      apt_repository:
+        repo: deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main
+        state: present
+
+    - name: Instalar Visual Studio Code
+      apt:
+        name: code
+        state: present

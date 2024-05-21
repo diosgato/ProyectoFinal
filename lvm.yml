@@ -1,0 +1,133 @@
+---
+- name: LVM
+  hosts: all
+  become: true
+  gather_facts: False
+
+
+
+  vars_prompt:
+
+    - name: disk_device
+
+      prompt: "Nombre Disco (e.g., /dev/sdd): "
+
+      private: False
+
+    - name: part_end
+
+      prompt: "End size de la particion  GiB (e.g., 45GiB): "
+
+      private: False
+
+    - name: vg_name
+
+      prompt: "Nombre de grupo volumen: "
+
+      private: False
+
+    - name: lv_name
+
+      prompt: "Nombre volumen logico: "
+
+      private: False
+
+    - name: lv_size
+
+      prompt: "Tamaño del Volumen logico  G (ej, 1G): "
+
+      private: False
+
+
+
+  tasks:
+
+    - name: Imprimir valores
+
+      ansible.builtin.debug:
+
+        msg: |
+
+          Disk Device: {{ disk_device }}
+
+          Partition End Size: {{ part_end }}
+
+          Volume Group Name: {{ vg_name }}
+
+          Logical Volume Name: {{ lv_name }}
+
+          Logical Volume Size: {{ lv_size }}
+
+
+
+    - name: Particionar el disco
+
+      community.general.parted:
+
+        device: "{{ disk_device }}"
+
+        number: 1
+
+        flags: [lvm]
+
+        state: present
+
+        part_end: "{{ part_end }}"
+
+
+
+    - name: PV and VG
+
+      community.general.lvg:
+
+        vg: "{{ vg_name }}"
+
+        pvs: "{{ disk_device }}1"
+
+
+
+    - name: Crear volumen
+
+      community.general.lvol:
+
+        vg: "{{ vg_name }}"
+
+        lv: "{{ lv_name }}"
+
+        size: "{{ lv_size }}"
+
+
+
+    - name: Formatear el volumen
+
+      community.general.filesystem:
+
+        fstype: ext4
+
+        dev: "/dev/{{ vg_name }}/{{ lv_name }}"
+
+
+
+    - name: Crear directorio de montaje
+
+      ansible.builtin.file:
+
+        path: "{{ mount_path }}"
+
+        state: directory
+
+        mode: '0755'
+
+
+
+    - name: Montar volumen logico
+
+      ansible.posix.mount:
+
+        path: "{{ mount_path }}"
+
+        src: "/dev/{{ vg_name }}/{{ lv_name }}"
+
+        fstype: ext4
+
+        state: mounted

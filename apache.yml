@@ -1,0 +1,32 @@
+- name: Instalacion de apache2
+  hosts: linux
+  become: yes
+  tasks:
+    - name: Eliminar Nginx (si está instalado)
+      apt:
+        name: nginx
+        state: absent
+        purge: yes
+
+    - name: Realizar apt autoremove (limpieza)
+      apt:
+        autoremove: yes
+
+- name: Instalar Apache en Ubuntu
+  hosts: all
+  become: yes
+  tasks:
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+
+    - name: Instalar Apache
+      apt:
+        name: apache2
+        state: present
+
+    - name: Asegurarse de que Apache esté en ejecución y habilitado al inicio
+      service:
+        name: apache2
+        state: started
+        enabled: yes

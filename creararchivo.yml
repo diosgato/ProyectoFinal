@@ -1,0 +1,23 @@
+---
+- name: Crear archivo de texto y añadir texto
+  hosts: linux
+  become: true  # Convierte al usuario root
+
+  tasks:
+    - name: Obtener nombre de usuario actual
+      ansible.builtin.shell:
+        cmd: whoami
+      register: current_user
+
+    - name: Crear archivo de texto
+      ansible.builtin.file:
+        path: "/var/www/html/perrosdias.txt"
+        state: touch
+      become: true  # Convierte al usuario root
+
+    - name: Añadir texto al archivo
+      ansible.builtin.lineinfile:
+        path: "/var/www/html/perrosdias.txt"
+        line: "perro ladrador poco mordedor"
+        create: yes
+      become: true  # Convierte al usuario root

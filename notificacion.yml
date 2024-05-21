@@ -1,0 +1,13 @@
+- name: Notificaciones
+  hosts: all
+  vars_prompt:
+    - name: notificar
+      prompt: "Introduce el mensaje de notificación:"
+      private: no
+  tasks:
+    - name: Enviar notificacion
+      command: notify-send "{{ notificar }}"
+  handlers:
+    - name: Mostrar Notificacion
+      debug:
+        msg: "Notification: {{ notificar }}"
