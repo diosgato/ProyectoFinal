@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: jjl
+      POSTGRES_PASSWORD: jjl
+      POSTGRES_DB: jjl
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: jjl@jjl.com
+      PGADMIN_DEFAULT_PASSWORD: jjl
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+volumes:
+  postgres_data:
